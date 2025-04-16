@@ -11,7 +11,7 @@ module MOD_N_Counter #(parameter N=3) (
     always @(posedge clk) begin
       if(!resetn)
           count_val<='h0;
-      else if(count_val==N)
+      else if(count_val==N-1)
           count_val<='h0;
       else
           count_val<=count_val+1'b1;
