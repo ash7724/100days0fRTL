@@ -2,12 +2,13 @@
 module tb_lfsr();
 
   // Write your Testbench here...
-      reg       clk;
-      reg       reset;
-      wire[3:0] lfsr_o;
+    parameter N=6;
+    reg       clk;
+    reg       reset;
+    wire[N-1:0] lfsr_o;
 
   
-lfsr_parameterized dut(
+lfsr_parameterized #(N) dut(
         clk,
         reset,
         lfsr_o
