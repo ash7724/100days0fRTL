@@ -4,7 +4,7 @@
 // Engineer: 
 // 
 // Create Date: 09.04.2025 09:50:12
-// Design Name: async_fifo_top.v
+// Design Name: 
 // Module Name: axis_async_fifo
 // Project Name: 
 // Target Devices: 
@@ -33,18 +33,20 @@ module axis_async_fifo #(parameter DEPTH=8)(
   output fifo_afull
     );
     
+  //parameter PTR_WIDTH = $clog2(DEPTH); 
   reg [15:0] memory_block [0:2**DEPTH-1];
-  reg  [DEPTH-1: 0] wr_pointer,rd_pointer;
-  wire [DEPTH-1: 0] wr_ptr_nxt,rd_ptr_nxt;
-  wire [DEPTH-1: 0] wr_pointer_sync,rd_pointer_sync;
+  reg  [DEPTH: 0] wr_pointer,rd_pointer;
+  wire [DEPTH: 0] wr_ptr_nxt,rd_ptr_nxt;
+  wire [DEPTH: 0] wr_pointer_sync,rd_pointer_sync;
   //reg [DEPTH-1: 0] wr_pointer_sync,rd_pointer_sync;
   //reg [DEPTH-1: 0] wr_pointer_reg,rd_pointer_reg;
-  wire [DEPTH-1: 0] wr_pointer_reg2,rd_pointer_reg2;  
-  wire [DEPTH-1: 0] wr_pointer_bin,rd_pointer_bin;
+  wire [DEPTH: 0] wr_pointer_reg2,rd_pointer_reg2;  
+  wire [DEPTH: 0] wr_pointer_bin,rd_pointer_bin;
 
   wire fifo_full;
   reg  r_fifo_full;
-  assign fifo_full  = wr_pointer== {~rd_pointer_bin[DEPTH-1:0],rd_pointer_bin[DEPTH-2:0]};
+  //assign fifo_full  = wr_pointer== {~rd_pointer_bin[DEPTH-1:0],rd_pointer_bin[DEPTH-2:0]};
+  assign fifo_full = wr_pointer==2**DEPTH-1;
   assign fifo_afull = wr_pointer==2**DEPTH-3;
   assign fifo_empty = rd_pointer_bin==wr_pointer_bin? 1'b1 :1'b0;
   
@@ -58,22 +60,22 @@ module axis_async_fifo #(parameter DEPTH=8)(
  //Converting read and write pointer into grey code
     
  /// Write pointer sync in rd clock domain
- b2g_conv b2g_wr_inst (
+ b2g_conv #(.DEPTH(DEPTH)) b2g_wr_inst (
   .bin_num(wr_pointer),
   .grey_num(wr_pointer_sync)
  );
  
- g2b_conv g2b_wr_inst (
+ g2b_conv #(.DEPTH(DEPTH)) g2b_wr_inst (
   .grey_num(wr_pointer_sync),
   .bin_num(wr_pointer_bin)
  );
 
- b2g_conv b2g_rd_inst (
+ b2g_conv #(.DEPTH(DEPTH)) b2g_rd_inst (
   .bin_num(rd_pointer),
   .grey_num(rd_pointer_sync)
  );
  
- g2b_conv g2b_rd_inst (
+ g2b_conv  #(.DEPTH(DEPTH))g2b_rd_inst (
   .grey_num(rd_pointer_reg2),
   .bin_num(rd_pointer_bin)
  );   
@@ -115,5 +117,4 @@ module axis_async_fifo #(parameter DEPTH=8)(
     else            rd_pointer<=rd_ptr_nxt;
   end
 
-  
 endmodule
