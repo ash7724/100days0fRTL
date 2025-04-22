@@ -22,11 +22,11 @@
 module dff_sync #(parameter DEPTH=8) ( 
   input   clk, 
   input   resetn, 
-  input   [DEPTH-1 : 0] data_in, 
-  output  [DEPTH-1 : 0] data_out 
+  input   [DEPTH : 0] data_in, 
+  output  [DEPTH : 0] data_out 
 );
- reg [DEPTH-1 : 0] data_dff1 ;
- reg [DEPTH-1 : 0] data_dff2 ;
+ reg [DEPTH : 0] data_dff1 ;
+ reg [DEPTH : 0] data_dff2 ;
  /// Read pointer sync in wr clock domain
    always @(posedge clk) begin
      if(!resetn) begin
