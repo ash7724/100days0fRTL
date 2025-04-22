@@ -58,21 +58,19 @@ module tb_async_fifo(
        @(posedge wr_clk);
        resetn<=1;
        #100
-       repeat(257) begin
+       repeat(256) begin
         @(posedge wr_clk);
         wr_en<=1;
         wr_data<=$urandom;
        end
         wr_en<=0;
-       repeat(10) begin
+       repeat(256) begin
         @(posedge rd_clk);
         rd_en<=1;
         @(posedge rd_clk);
-        @(posedge rd_clk);
-        @(posedge rd_clk);
+        end    
         #100
-        rd_en<=0;
-        end       
+        rd_en<=0;   
      end
      
      always #10  rd_clk<=~rd_clk;
