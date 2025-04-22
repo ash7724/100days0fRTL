@@ -48,10 +48,10 @@ module axis_async_fifo #(parameter DEPTH=8)(
   //assign fifo_full  = wr_pointer== {~rd_pointer_bin[DEPTH-1:0],rd_pointer_bin[DEPTH-2:0]};
   assign fifo_full = wr_pointer==2**DEPTH-1;
   assign fifo_afull = wr_pointer==2**DEPTH-3;
-  assign fifo_empty = rd_pointer_bin==wr_pointer_bin? 1'b1 :1'b0;
+  assign fifo_empty = rd_pointer_sync==wr_pointer_reg2? 1'b1 :1'b0;
   
   //Reading and Writing Data to and from memory
-  assign rd_data = rd_en ? memory_block[rd_pointer]: 0;
+  assign rd_data = (rd_en && !fifo_empty) ?  memory_block[rd_pointer]: 0;
   always @(posedge wr_clk) begin
     if (wr_en)
       memory_block[wr_pointer]<= wr_data;
