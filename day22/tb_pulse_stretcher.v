@@ -26,6 +26,7 @@ module tb_pulse_stretcher();
     parameter N_mod=32;    
     reg       wr_clk;
     reg       reset;
+    reg       sel;
     wire      pulse_en;
     wire [N_mod-1:0] count;
     reg pulse;
@@ -46,8 +47,11 @@ pulse_stretcher #(.N(N_mod)) dut_clk_div(
   initial begin
     reset<=1'b1;
     pulse<=1'b0;
+    sel<=1;
     rd_resetn<=1'b0;
-    #10
+    @(posedge rd_clk);
+    rd_resetn<=1'b1;
+     #10
     @(posedge wr_clk);
     reset<=1'b0;
     #100
@@ -55,8 +59,13 @@ pulse_stretcher #(.N(N_mod)) dut_clk_div(
         pulse<=1'b1;
     @(posedge wr_clk);
         pulse<=1'b0; 
-    @(posedge rd_clk);
-        rd_resetn<=1'b1;  
+    #5000
+    @(posedge wr_clk);
+       sel<=0;
+    @(posedge wr_clk);
+       pulse<=1'b1;
+    @(posedge wr_clk);
+       pulse<=1'b0;     
   end
   
   always begin
@@ -65,7 +74,7 @@ pulse_stretcher #(.N(N_mod)) dut_clk_div(
   end
 
   always begin
-      #25 rd_clk<=1'b0;
-      #25 rd_clk<=1'b1;
+      #35 rd_clk<=1'b0;
+      #35 rd_clk<=1'b1;
   end  
 endmodule
