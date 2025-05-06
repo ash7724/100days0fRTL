@@ -9,8 +9,6 @@ All the flops should be positive edge triggered with asynchronous resets (if any
 The generator should produce output every cycle
 You can assume that the sequence generator would never overflow
 
-Second circuit is for detecting a big sequence - 1110_1101_1011
-
 */
 module seq_generator (
   input           clk,
@@ -21,6 +19,9 @@ module seq_generator (
   output   [31:0] seq_o
 );
    
+  // Detecting a big sequence - 1110_1101_1011
+  // Write your logic here...
+  
   parameter s_0=0,
   			 s_1=1, 
              s_11=2,
@@ -44,7 +45,7 @@ module seq_generator (
      //Method 2   
     always @(posedge clk) begin
         if(reset)   data_seq<='h0;
-        else        data_seq<={x_i,data_seq[11:1] };
+        else        data_seq<={data_seq[10:0],x_i };
     end
     always @(posedge clk) begin
         if(data_seq==12'b1110_1101_1011)
@@ -82,8 +83,10 @@ module seq_generator (
                         else     next=s_111;
           s_1110_1101_10:if(x_i) next=s_1110_1101_101;
                          else    next=s_0;
-          s_1110_1101_101:if(x_i)next=s_11;
+          s_1110_1101_101:if(x_i)next=s_1110_1101_1011;
                           else   next=s_0;
+          s_1110_1101_1011:if(x_i)next=s_1110_1101_1011;
+                          else   next=s_0;                          
           default:               next=s_0;
         endcase;
     end
@@ -91,12 +94,13 @@ module seq_generator (
     always @(posedge clk) begin
         det_reg_method1<=0;
         case(state)
-            s_1110_1101_101:  det_reg_method1<=1'b1;
+            s_1110_1101_1011:  det_reg_method1<=1'b1;
         endcase
     end
     assign det_o= det_reg_method1;
     //End of Method 1
 
+  //Code for 0 ? 1 ? 1 ? 1 ? 2 ? 2 ? 3 ? 4 ? 5 ? 7 ? 9 ? 12 ? 16 ? 21 ? 28 ? 37 ? ... Sequence detection
     always @(posedge clk) begin
         if(reset) begin
             seq_reg_a<='h0;
