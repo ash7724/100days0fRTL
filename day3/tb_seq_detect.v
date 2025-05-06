@@ -54,7 +54,56 @@ module tb_fancy_timer(    );
             shift_en,
             done,
             ack );
-                 
+    
+    task init();
+        begin
+             clk     <=0;
+             reset   <=1;
+             data    <=0;
+             ack     <=0;
+        end
+    endtask
+    
+    task reset_release();
+        begin
+            @(posedge clk);
+                reset<=0;
+        end
+    endtask 
+  
+    task send_counter_data();
+        begin
+            @(posedge clk);
+            data<=shift_count[3];
+            @(posedge clk);
+            data<=shift_count[2];
+            @(posedge clk);
+            data<=shift_count[1];
+            @(posedge clk);
+            data<=shift_count[0];
+        end
+    endtask
+    
+    task send_seq_data();
+        begin
+    ///Send data 1101
+            @(posedge clk);
+            data<=1;
+            @(posedge clk);
+            data<=1;
+            @(posedge clk);
+            data<=0;
+            @(posedge clk);
+            data<=1; 
+        end
+    endtask
+    
+    task wait_for_ack();
+        begin
+            @(posedge done);
+                ack<=1;
+        end
+    endtask                      
   always @(posedge clk) begin
     if(reset)
         val_count<=15;
@@ -70,40 +119,17 @@ module tb_fancy_timer(    );
                  
  initial begin
     $monitor ("\n %x\t  %x\t  %x\t  %x\t",x_i,val[val_count],val_count,det_o);
-    clk<=0;
-    reset<=1;
-    data<=0;
-    ack<=0;
-    @(posedge clk);
-    reset<=0;
+    init();
+    reset_release();
     repeat(5) begin
-    ///Send data 1101
-    @(posedge clk);
-    data<=1;
-    @(posedge clk);
-    data<=1;
-    @(posedge clk);
-    data<=0;
-    @(posedge clk);
-    data<=1;    
-            
-    @(posedge clk);
-    data<=shift_count[3];
-    @(posedge clk);
-    data<=shift_count[2];
-    @(posedge clk);
-    data<=shift_count[1];
-    @(posedge clk);
-    data<=shift_count[0];
-    
-    @(posedge done);
-     ack<=1;
+    send_seq_data();
+    send_counter_data();             
+    wait_for_ack();    
     @(posedge clk);
     @(posedge clk);
     @(posedge clk);
-        
   end    
  end
  always #10 clk<=~clk;
- 
+
 endmodule
