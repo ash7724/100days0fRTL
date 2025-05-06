@@ -57,9 +57,9 @@ module tb_fancy_timer(    );
                  
   always @(posedge clk) begin
     if(reset)
-        val_count<=0;
+        val_count<=15;
     else
-        val_count<=val_count+1'b1;
+        val_count<=val_count-1'b1;
   end
   always @(posedge clk) begin
     if(reset)
